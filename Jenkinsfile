@@ -17,6 +17,7 @@ pipeline {
         NEXUS_LOGIN = 'nexus-creds'
 	    SONARSERVER = 'sonar_server'
 	    SONARSCANNER = 'SONAR'
+	    NEXUSPASS = credentials('nexus-pwd')
 	        registryCredential = 'ecr:us-west-1:aws-creds'
         appRegistry = '592255970248.dkr.ecr.us-west-1.amazonaws.com/vprofile-man'
         vprofileRegistry = "https://592255970248.dkr.ecr.us-west-1.amazonaws.com"
@@ -124,5 +125,29 @@ pipeline {
  	//                } 
 	//            }
  	//        }
+
+	stage('Ansible deploy to staging') {
+		steps {
+                ansiblePlaybook([
+                inventory   : 'ansible/stage.inventory',
+                playbook    : 'ansible/site.yml',
+                installation: 'ansible',
+                colorized   : true,
+			    credentialsId: 'app-server-creds',
+			    disableHostKeyChecking: true,
+                extraVars   : [
+                   	USER: "admin",
+                    PASS: "${NEXUSPASS}",
+			        nexusip: "172.31.10.247",
+			        reponame: "vprofile-release",
+			        groupid: "QA",
+			        time: "${env.BUILD_TIMESTAMP}",
+			        build: "${env.BUILD_ID}",
+                    artifactid: "vproapp",
+			        vprofile_version: "vproapp-${env.BUILD_ID}-${env.BUILD_TIMESTAMP}.war"
+                ]
+             ])
+            }
+	}
     }
 }
