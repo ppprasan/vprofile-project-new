@@ -28,7 +28,7 @@ pipeline {
         ARTIFACT_NAME = "vprofile-v${buildNumber}.war"
         AWS_S3_BUCKET = 'beanstalk-vpro'
         AWS_EB_APP_NAME = 'new-application'
-        AWS_EB_ENVIRONMENT = 'New-application-stage'
+        AWS_EB_ENVIRONMENT = 'New-application-prod'
         AWS_EB_APP_VERSION = "${buildNumber}"
     }
 
